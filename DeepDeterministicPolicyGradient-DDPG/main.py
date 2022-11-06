@@ -3,6 +3,7 @@ import torch as t
 from model import DDPG
 import gym
 import time
+import torch
 # INIT TENSORBOARDX
 from tensorboardX import SummaryWriter
 writer = SummaryWriter("./DeepDeterministicPolicyGradient/logs")
@@ -18,7 +19,7 @@ def generate_env(env_name: str):
 
 
 # HYPER PARAMETERS
-env, N_states, _ = generate_env("Pendulum-v0")
+env, N_states, _ = generate_env("Pendulum-v1")
 MAX_EPISODES = 200
 MAX_EP_STEPS = 1000
 MEMORY_CAPACITY = 50000
@@ -44,15 +45,14 @@ for i in range(MAX_EPISODES):
         # Add exploration noise
         a = ddpg.choose_action(s)
         a = np.clip(np.random.normal(a, STD), -2, 2)
-
-        s_, r, done, _ = env.step(a)
+        s_, r, done, _, __ = env.step(a)
 
         ddpg.store_transition(s, a, r/10, s_)
 
         if ddpg.memory_pointer > MEMORY_CAPACITY:
             STD = STD*0.995
             td_error = ddpg.learn()
-            td_errors.append(td_error)
+            td_errors.append(ddpg.learn())
             # TRANSFER TO TENSORBOARD
             writer.add_scalar("tderror", td_error, total_step)
             total_step += 1
@@ -63,7 +63,6 @@ for i in range(MAX_EPISODES):
     if ep_reward > -300:
         RENDER = True
     t2 = time.time()
-
     print("Episode:{},Reward:{},TD_error:{},UseTime:{}".format(
         i, ep_reward, np.mean(td_errors), t2-t1))
 

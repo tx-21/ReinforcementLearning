@@ -7,7 +7,6 @@
 $$
 \begin{aligned}
 V_\pi(s)  &= \sum_{a \in \mathcal{A}} \pi(a\vert s) \left (R_s^a + \gamma \sum_{s^\prime \in \mathcal{S} }\mathcal{P}_{s s^\prime}^a V_\pi (s^\prime)\right)\\
-
 q_\pi(s,a) &= R_s^a + \gamma \sum_{s^\prime \in \mathcal{S}}\mathcal{P}_{s s^\prime} ^a\sum_{a^\prime \in \mathcal{A}} \pi(a^\prime \vert s^\prime) q_\pi(s^\prime,a^\prime)
 \end{aligned}
 $$
@@ -36,11 +35,8 @@ $$Q^*(s,a) = \underset{\pi}{\max} \ Q_\pi(s,a)$$
 $$
 \begin{aligned}
 V^*(s) = \underset{a}{\max} \left(R_s^a + \gamma \sum_{s^\prime \in \mathcal{S} }\mathcal{P}_{s s^\prime}^a V^*(s^\prime)\right)\\
-
 Q^*(s,a) = R_s^a + \gamma \sum_{s^\prime \in \mathcal{S} }\mathcal{P}_{s s^\prime} ^a \underset{a^\prime}{\max} \ Q^*(s^\prime,a^\prime)
-
 \end{aligned}
-
 $$
 
 我们选取动作就是需要让Q值最大：

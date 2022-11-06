@@ -68,7 +68,7 @@ where the \* mark means the algorithm is important and worth diving into it
 
 2. 几乎所有的强化学习问题可以使用马尔科夫决策过程（MDPs）来描述，MDP 中的所有状态都具有“马尔科夫性”：未来仅仅依赖于当前的状态，并不与历史状态相关，在给定当前状态下，未来与过去条件独立，也就是**当前状态包含了决定未来所需的所有信息**。
 
-3. 策略：即智能体 agent 的行为函数 $\pi$，是当前状态到一个动作的映射，它可以是随机性的(random)也可以是确定性的(deterministic)：
+3. 策略(policy)：即智能体 agent 的行为函数 $\pi$，是当前状态到一个动作的映射，它可以是随机性的(random)也可以是确定性的(deterministic)：
 
    1. $\pi(s)=a$
    2. $\pi(a \mid s)= \mathbb{P}_{\pi}(A=a \mid S=s)$
@@ -78,7 +78,7 @@ where the \* mark means the algorithm is important and worth diving into it
    1. $$ U_t = R_{t+1} + \gamma R_{t+2} + \dots = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1} $$
       在[下面第六节](#1-关键概念-key-concepts)中会详细讲到
 
-   2. $\gamma$ 作为对未来奖励的`惩罚`(`penaty`)，因为：
+   2. $\gamma$ 作为对未来奖励的`惩罚`(`penalty`)，因为：
       1. 未来奖励的不确定性
       2. 未来奖励不会直接提供收益
       3. 数学上便利，无需在乎太远的奖励，被 $\gamma$ 衰减掉了
@@ -297,9 +297,7 @@ where the \* mark means the algorithm is important and worth diving into it
 #### 3. **使用多步TD Target 来减少偏差**
 
   之前说到$ U_t = R_t + \gamma U_{t+1}$,我们可以进一步展开：
-  $$
-  U_t = R_t + \gamma (R_{t+1}+\gamma U_{t+2})
-  $$
+  $$U_t = R_t + \gamma (R_{t+1}+\gamma U_{t+2})$$
   这样就可以使用2步甚至更多步的数据来更新我们的神经网络，来提升稳定性。
 
 ### 3. SarsaLambda
@@ -432,29 +430,30 @@ where the \* mark means the algorithm is important and worth diving into it
 
 #### 1. Advantage Function 优势函数
 
-  $$
-  \begin{aligned}
+$$
+\begin{aligned}
   Q^* (s,a) &= \underset{a}{max} \  Q_{\pi}(s,a)\\
   V^* (s) &= \underset{\pi}{max} \  V_{\pi}(s)\\
   A^* (s,a) &= Q^*(s,a) -V^*(s)
-  \end{aligned}
-  $$
-  $A^*(s,a)$的意思是动作$a$相对于baseline $V^*(s)$的优势，动作$a$越好，$A^*(s,a)$越大。
+\end{aligned}
+$$
 
-  由于$ V^*(s) = \underset{a}{max} \ Q ^*(s,a)$，我们对左右两边取最大值，有：
-  $$
-  \underset{a}{max} \ A^*(s,a) = \underset{a}{max} \ Q_{\pi}(s,a) - V^*(s) =0
-  $$
+$A^*(s,a)$的意思是动作$a$相对于baseline $V^*(s)$的优势，动作$a$越好，$A^*(s,a)$越大。
 
-  我们将公式变换一下：
-  $$
-  Q^*(s,a) = V^*(s) + A^* (s,a)
-  $$
+由于$ V^*(s) = \underset{a}{max} \ Q ^*(s,a)$，我们对左右两边取最大值，有：
+$$
+\underset{a}{max} \ A^*(s,a) = \underset{a}{max} \ Q_{\pi}(s,a) - V^*(s) =0
+$$
 
-  再减去一个0 ： $\underset{a}{max} \ A^*(s,a)$得到：
-  $$
-  Q^*(s,a) = V^*(s) + A^* (s,a) - \underset{a}{max} \ A^*(s,a)
-  $$
+我们将公式变换一下：
+$$
+Q^*(s,a) = V^*(s) + A^* (s,a)
+$$
+
+再减去一个0 ： $\underset{a}{max} \ A^*(s,a)$得到：
+$$
+Q^*(s,a) = V^*(s) + A^* (s,a) - \underset{a}{max} \ A^*(s,a)
+$$
 
 #### 2. Dueling DQN的设计
 
@@ -527,16 +526,12 @@ def forward(self, x: t.Tensor) -> t.Tensor:
 - Discounted Return, Action-value function, State-value function
   $$
   \begin{aligned}
-  U_t &= R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \gamma^3 R_{t+3} + \dots
-   \\
-
+  U_t &= R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \gamma^3 R_{t+3} + \dots\\
   Q_{\pi}(s_t,a_t) &= \mathbb{E}[U_t \vert S_t=s_t,A_t= a_t]\\
-
-  V_{\pi}(s_t)&=\mathbb{E}_
-  A[Q_{\pi}(s_t,A)], A \sim \pi (\cdot \vert s_t)
-
+  V_{\pi}(s_t)&=\mathbb{E}_A[Q_{\pi}(s_t,A)], A \sim \pi (\cdot \vert s_t)
   \end{aligned}
   $$
+
   对于离散的动作我们有
   $$
   V_{\pi}(s_t) = \mathbb{E}[Q_{\pi}(s_t,A)] =\Sigma_a \pi(a \vert s_t)Q_{\pi}(s_t,a),A \sim \pi (\cdot \vert s_t)
@@ -574,20 +569,12 @@ def forward(self, x: t.Tensor) -> t.Tensor:
   2. 证明baseline的理论性质
       $$
       \begin{aligned}
-      \mathbb{E}
-      _
-      {A \sim \pi(\cdot \vert s; \theta)}\left[b \cdot \frac{\partial  \ln \pi(A \vert s;\theta) }{\partial \theta} \right] &= b \cdot \mathbb{E}_ {A \sim \pi(\cdot \vert s; \theta)}\left[\frac{\partial  \ln \pi(A \vert s;\theta) }{\partial \theta} \right]\\
-
+      \mathbb{E}_{A \sim \pi(\cdot \vert s; \theta)}\left[b \cdot \frac{\partial  \ln \pi(A \vert s;\theta) }{\partial \theta} \right] &= b \cdot \mathbb{E}_ {A \sim \pi(\cdot \vert s; \theta)}\left[\frac{\partial  \ln \pi(A \vert s;\theta) }{\partial \theta} \right]\\
       &= b \cdot \sum_a \pi(a \vert s; \theta) \cdot \frac{\partial  \ln \pi(a \vert s;\theta) }{\partial \theta}\\
-
       &= b \cdot \sum_a \pi(a \vert s; \theta) \cdot \frac {1}{\pi(a \vert s; \theta)}\frac{\partial   \pi(a \vert s;\theta) }{\partial \theta}\\
-
       &= b \cdot \sum_a \frac{\partial   \pi(a \vert s;\theta) }{\partial \theta}\\
-
       &= b \cdot  \frac{\sum_a \partial   \pi(a \vert s;\theta) }{\partial \theta}\\
-
       &= b\cdot \frac{\partial 1 }{\partial \theta}\\
-
       &= 0
       \end{aligned}
       $$
@@ -659,33 +646,29 @@ def forward(self, x: t.Tensor) -> t.Tensor:
 
 #### 1. 具体推导（简单版本）
 
-  这里是不严谨的推导，便于直观地上手，我们假设 $Q_\pi$ 不依赖于 $\theta$，要查看详细的推导，请移步至
-  [本文的这里](#4-policy-gradient-算法的详细推导有点难),具体的过程以及一系列讲解请查看
-  [这个网站](https://paperexplained.cn/articles/article/detail/31/)
+这里是不严谨的推导，便于直观地上手，我们假设 $Q_\pi$ 不依赖于 $\theta$，要查看详细的推导，请移步至
+[本文的这里](#4-policy-gradient-算法的详细推导有点难),具体的过程以及一系列讲解请查看
+[这个网站](https://paperexplained.cn/articles/article/detail/31/)
 
-  $$V(s_t;\mathbf{\theta})=\Sigma_a \pi(a \vert s_t;\mathbf{\theta})Q_{\pi}(s_t,a)$$
+$$V(s_t;\mathbf{\theta})=\Sigma_a \pi(a \vert s_t;\mathbf{\theta})Q_{\pi}(s_t,a)$$
 
-  $$
-  \begin{aligned}
-  \frac{\partial V(s;\theta)}{\partial \theta} &= \frac{\partial \Sigma_a \pi(a \vert s;\theta) Q_{\pi}(s,a)}{\partial \theta}\\
+$$
+\begin{aligned}
+\frac{\partial V(s;\theta)}{\partial \theta} &= \frac{\partial \Sigma_a \pi(a \vert s;\theta) Q_{\pi}(s,a)}{\partial \theta}\\
+&= \Sigma_a\frac{\partial  \pi(a \vert s;\theta) Q_{\pi}(s,a)}{\partial \theta}\\
+&= \Sigma_a\frac{\partial  \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a) \text{ 假设Qpi不依赖于theta,但不严谨}\\
+\end{aligned}
+$$
 
-  &= \Sigma_a\frac{\partial  \pi(a \vert s;\theta) Q_{\pi}(s,a)}{\partial \theta}\\
+于是就有了
 
-  &= \Sigma_a\frac{\partial  \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a) \text{ 假设Qpi不依赖于theta,但不严谨}\\
-
-  \end{aligned}
-  $$
-  于是就有了
-  $$
-  \begin{aligned}
-
-  \frac{\partial V(s;\theta)}{\partial \theta}&=\Sigma_a\frac{\partial  \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a)\\
-
-  &= \Sigma_a\ \pi(a \vert s;\theta)\frac{\partial  \log \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a)\\
-  
-  &= \mathbb{E}_ {A \sim \pi(\cdot \vert s; \theta)}\left[\frac{\partial  \log \pi(A \vert s;\theta) }{\partial \theta} \ Q_{\pi}(s,A)\right]
-  \end{aligned}
-  $$
+$$
+\begin{aligned}
+\frac{\partial V(s;\theta)}{\partial \theta}&=\Sigma_a\frac{\partial  \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a)\\
+&= \Sigma_a\ \pi(a \vert s;\theta)\frac{\partial  \log \pi(a \vert s;\theta) }{\partial \theta} Q_{\pi}(s,a)\\
+&= \mathbb{E}_ {A \sim \pi(\cdot \vert s; \theta)}\left[\frac{\partial  \log \pi(A \vert s;\theta) }{\partial \theta} \ Q_{\pi}(s,A)\right]
+\end{aligned}
+$$
 
 - 对于离散的动作来说使用
         $$
@@ -808,64 +791,52 @@ def forward(self, x: t.Tensor) -> t.Tensor:
     根据目标函数$J(\theta)$的梯度 $\nabla_\theta J(\theta)$，我们可以提升策略梯度算法，最终可以最大化最终收益。
 
     上面的$J(\theta)$是在连续环境（没有固定的终止状态）下的目标函数(被称为**平均值**)，连续环境下还有一种性质更好的目标函数，叫做**平均回报**：
-      $$
-      \begin{aligned}
-      J(\theta) &\approx r(\pi)\\
-      & \approx \lim_{h \to \infty} \frac{1}{h} \sum_{t=1}^h \mathbb{E} [R_t \vert S_0, A_{0:t-1} \sim \pi]\\
+    $$
+    \begin{aligned}
+    J(\theta) &\approx r(\pi)\\
+    & \approx \lim_{h \to \infty} \frac{1}{h} \sum_{t=1}^h \mathbb{E} [R_t \vert S_0, A_{0:t-1} \sim \pi]\\
+    &= \lim_{t \to \infty} \mathbb{E} [R_t \vert S_0, A_{0:t-1}]\\
+    &= \sum_s \mu(s) \sum_a \pi_\theta(a \vert s) \sum_{s^{\prime},r} p(s^{\prime},r \vert s,a)r\\
+    \end{aligned}
+    $$
 
-      &= \lim_{t \to \infty} \mathbb{E} [R_t \vert S_0, A_{0:t-1}]\\
+    我们还定义：
+    $$
+    \begin{aligned}
+    G_t &= R_{t+1} - r(\pi)+R_{t+2} - r(\pi)+R_{t+3} - r(\pi)+\dots\\
+    V^\pi(s) &= \sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r-r(\pi) + V^\pi(s^\prime)]\\
+    Q^\pi(s,a)&= \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r-r(\pi) +\sum_{a^\prime} \pi_\theta(a^\prime \vert s^\prime)Q^\pi({s^\prime,a^\prime})]\\
+    \end{aligned}
+    $$
 
-      &= \sum_s \mu(s) \sum_a \pi_\theta(a \vert s) \sum_{s^{\prime},r} p(s^{\prime},r \vert s,a)r\\
+    分别为**差分累计回报定义——回报与平均回报差值的累加值、差分状态-价值函数和差分动作状态-价值函数**。
 
-      \end{aligned}
-      $$
+    平均值目标函数是 $J(\theta)$的**另外一种形式**：
 
-      我们还定义：
-      $$
-      \begin{aligned}
-      G_t &= R_{t+1} - r(\pi)+R_{t+2} - r(\pi)+R_{t+3} - r(\pi)+\dots\\
-      V^\pi(s) &= \sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r-r(\pi) + V^\pi(s^\prime)]\\
+    $$
+    \begin{aligned}
+     J(\theta) &=  \sum_{s\in \mathcal{S}} d^\pi(s) V^\pi(s)\\
+    &= \sum_{s\in \mathcal{S}} d^\pi(s)\underbrace {\sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r +\gamma V^\pi(s^\prime)]}_{V^\pi(s)}\\
+    &= r(\pi) + \sum_{s\in \mathcal{S}} d^\pi(s) {\sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [V^\pi(s^\prime)]},根据定义把r(\pi)提出来\\
+    &= r(\pi) + \gamma \sum_{s^\prime}V^\pi(s^\prime) \sum_s d^\pi(s) \sum_a \pi_\theta(a \vert s) p(s^\prime \vert s,a)\\
+    &= r(\pi) + \gamma \sum_{s^\prime}V^\pi(s^\prime)d^\pi(s^\prime)\\
+    &= r(\pi) + \gamma J(\theta)\\
+    &= r(\pi) + \gamma (r(\pi) + \gamma J(\theta))\\
+    &= \dots\\
+    &= \frac{1}{1-\gamma} r(\pi)
+    \end{aligned}
+    $$
 
-      Q^\pi(s,a)&= \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r-r(\pi) +\sum_{a^\prime} \pi_\theta(a^\prime \vert s^\prime)Q^\pi({s^\prime,a^\prime})]\\
-      \end{aligned}
-      $$
+    ***因此在下面的推导中，只考虑平均回报形式的目标函数$r(\pi)$***
 
-      分别为**差分累计回报定义——回报与平均回报差值的累加值、差分状态-价值函数和差分动作状态-价值函数**。
-
-      平均值目标函数是 $J(\theta)$的**另外一种形式**：
-
-      $$
-      \begin{aligned}
-       J(\theta) &=  \sum_{s\in \mathcal{S}} d^\pi(s) V^\pi(s)\\
-
-      &= \sum_{s\in \mathcal{S}} d^\pi(s)\underbrace {\sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [r +\gamma V^\pi(s^\prime)]}_{V^\pi(s)}\\
-
-      &= r(\pi) + \sum_{s\in \mathcal{S}} d^\pi(s) {\sum_a \pi_\theta(a \vert s) \sum_{r,s^\prime} p(s^\prime,r \vert s,a) [V^\pi(s^\prime)]},根据定义把r(\pi)提出来\\
-
-      &= r(\pi) + \gamma \sum_{s^\prime}V^\pi(s^\prime) \sum_s d^\pi(s) \sum_a \pi_\theta(a \vert s) p(s^\prime \vert s,a)\\
-
-      &= r(\pi) + \gamma \sum_{s^\prime}V^\pi(s^\prime)d^\pi(s^\prime)\\
-
-      &= r(\pi) + \gamma J(\theta)\\
-
-      &= r(\pi) + \gamma (r(\pi) + \gamma J(\theta))\\
-
-      &= \dots\\
-
-      &= \frac{1}{1-\gamma} r(\pi)
-      \end{aligned}
-      $$
-
-      ***因此在下面的推导中，只考虑平均回报形式的目标函数$r(\pi)$***
-
-      综上所述，目标函数有`3种形式`:
-      $$
-      \begin{aligned}
-      J(\theta) &\overset{\text{def}}{=} \sum_{s\in \mathcal{S}} d^\pi(s)\sum_{a \in \mathcal{A}} Q^{\pi}(s,a) \pi_\theta(a \vert s) \text{连续环境下的平均值形式目标函数,无固定终结状态}\\
-      & \overset{\text{def}}{=} \sum_s \mu(s) \sum_a \pi_\theta(a \vert s) \sum_{s^{\prime},r} p(s^{\prime},r \vert s,a)r\text{连续环境下的平均回报形式目标函数,无固定终结状态}\\
-      &\overset{\text{def}}{=} V^\pi(s_0) =\mathbb{E}\left[\sum_{t=1}^{+\infty}\gamma^t r_t \vert s_0,\pi\right]\text{周期环境下的目标函数,有固定的起始状态和终结状态}
-      \end{aligned}
-      $$
+    综上所述，目标函数有`3种形式`:
+    $$
+    \begin{aligned}
+    J(\theta) &\overset{\text{def}}{=} \sum_{s\in \mathcal{S}} d^\pi(s)\sum_{a \in \mathcal{A}} Q^{\pi}(s,a) \pi_\theta(a \vert s) \text{连续环境下的平均值形式目标函数,无固定终结状态}\\
+    & \overset{\text{def}}{=} \sum_s \mu(s) \sum_a \pi_\theta(a \vert s) \sum_{s^{\prime},r} p(s^{\prime},r \vert s,a)r\text{连续环境下的平均回报形式目标函数,无固定终结状态}\\
+    &\overset{\text{def}}{=} V^\pi(s_0) =\mathbb{E}\left[\sum_{t=1}^{+\infty}\gamma^t r_t \vert s_0,\pi\right]\text{周期环境下的目标函数,有固定的起始状态和终结状态}
+    \end{aligned}
+    $$
 2. 策略梯度定理
 
     由于梯度 $ \nabla_\theta J(\theta)$的计算是非常棘手的，但是我们有策略梯度定理：
@@ -884,15 +855,10 @@ def forward(self, x: t.Tensor) -> t.Tensor:
     \begin {aligned}
     \nabla_\theta V^\pi(s)
     &=\nabla_\theta \left(\sum_{a\in \mathcal{A}} \pi(a\vert s;\theta) Q^\pi(s,a)\right)\\
-
     &=\sum_{a\in \mathcal{A}} \left(\nabla_\theta \pi_\theta(a\vert s)Q^\pi(s,a) + \pi_\theta(a \vert s) \nabla_\theta Q^\pi(s,a) \right)\\
-
     &=\sum_{a\in \mathcal{A}}\left(\nabla_\theta \pi_\theta(a\vert s)Q^\pi(s,a) + \pi_\theta(a \vert s) \nabla_\theta \underbrace{\sum_{s^{\prime},r} P(s^\prime,r \vert s,a)(r + V^\pi(s^\prime))}_{Q^\pi(s,a)} \right)\\
-
     &=\sum_{a\in \mathcal{A}}\left(\nabla_\theta \pi_\theta(a\vert s)Q^\pi(s,a) + \pi_\theta(a \vert s) \sum_{s^{\prime},r} P(s^\prime,r \vert s,a) \nabla_\theta V^\pi(s^\prime) \right) \text{r和状态转移概率与theta无关}\\
-
     &=\sum_{a\in \mathcal{A}}\left(\nabla_\theta \pi_\theta(a\vert s)Q^\pi(s,a) + \pi_\theta(a \vert s) \sum_{s^{\prime}} \underbrace{P(s^\prime \vert s,a)}_{P(s^\prime \vert s,a) = \sum_{r}P(s^\prime,r \vert s,a)} \nabla_\theta V^\pi(s^\prime) \right)
-
     \end{aligned}  
     $$
 
@@ -919,27 +885,18 @@ def forward(self, x: t.Tensor) -> t.Tensor:
     $$
     \begin{aligned}
     \nabla_\theta V^\pi(s) &=\sum_{a\in \mathcal{A}}\left(\nabla_\theta \pi_\theta(a\vert s)Q^\pi(s,a) + \pi_\theta(a \vert s) \sum_{s^{\prime}} P(s^\prime \vert s,a) \nabla_\theta V^\pi(s^\prime) \right)\\
-
     &= \phi(s) + \sum_a \pi_\theta(a \vert s)\sum_{s^{\prime}} P(s^\prime \vert s,a) \nabla_\theta V^\pi(s^\prime)\\
-
     &= \phi(s) + \sum_a\sum_{s^{\prime}} \pi_\theta(a \vert s) P(s^\prime \vert s,a) \nabla_\theta V^\pi(s^\prime)\\
-
     &= \phi(s)+ \sum_a \underbrace{\rho^\pi(s \to s^\prime, 1 )}
     _
     {
       \sum_{s^{\prime}} \pi_\theta(a \vert s) P(s^\prime \vert s,a)
     } \nabla_\theta V^\pi(s^\prime)\\
-
     &= \phi(s) + \sum_{s^{\prime}}\rho^\pi(s \to s^\prime, 1 )\left[\phi(s^\prime) + \sum_{s^{\prime\prime}}\rho^\pi(s^\prime \to s^{\prime\prime},1) \nabla_\theta V^\pi(s^{\prime\prime})  \right]\\
-
     &= \phi(s) + \sum_{s^{\prime}} \rho^\pi(s \to s^\prime, 1 )\phi(s^\prime) + \sum_{s^{\prime}} \rho^\pi(s \to s^\prime, 1 )\sum_{s^{\prime\prime}}\rho^\pi(s^\prime \to s^{\prime\prime},1) \nabla_\theta V^\pi(s^{\prime\prime}) \\
-
     &= \phi(s) +  \sum_{s^{\prime}} \rho^\pi(s \to s^\prime, 1 )\phi(s^\prime) + \sum_{s^{\prime\prime}}\rho^\pi(s \to s^{\prime\prime},2) \nabla_\theta V^\pi(s^{\prime\prime}) \text{将s撇作为中间状态}\\
-
     &= \phi(s) +  \sum_{s^{\prime}} \rho^\pi(s \to s^\prime, 1 )\phi(s^\prime) + \sum_{s^{\prime\prime}}\rho^\pi(s \to s^{\prime\prime},2)\phi(s^{\prime\prime}) + \sum_{s^{\prime\prime\prime}}\rho^\pi(s \to s^{\prime\prime\prime},2)\nabla_\theta V^\pi(s^{\prime\prime\prime})\\
-
     &= \dots \\
-
     &= \sum_{x\in \mathcal{S}}\sum_{k=0}^{\infty} \rho^\pi(s \to x,k)\phi(x)
     \end{aligned}
     $$
@@ -952,15 +909,10 @@ def forward(self, x: t.Tensor) -> t.Tensor:
       \begin{aligned}
       \nabla_\theta J(\theta) &= \nabla_\theta V^\pi(s_0)\\
       &= \sum_s \underbrace{\sum_{k=0}^{\infty} \rho^\pi(s_0 \to s,k)}_{\eta(s)}\phi(s)\\
-
       &= \sum_s {\eta(s)}\phi(s)\\
-
       &= (\sum_s \eta(s)) \sum_s \frac{\eta(s)}{\sum_s \eta(s)}\phi(s) \ \text{正则化} \eta(s)\text{使其成为一个概率分布}\\
-
       &\propto \sum_s \frac{\eta(s)}{\sum_s \eta(s)}\phi(s)\\
-
       &= \sum_s d^\pi(s) \sum_a \nabla_\theta \pi_\theta(a \vert s) Q^\pi (s,a) \ 因为\sum_s \eta(s)是常数,d^\pi(s)=\frac{\eta(s)}{\sum_s \eta(s)}是平稳分布
-
       \end{aligned}
       $$
 
@@ -970,17 +922,11 @@ def forward(self, x: t.Tensor) -> t.Tensor:
       \begin{aligned}
       \nabla_\theta V^\pi(s) \\
       &= \nabla_\theta(\sum_{a\in \mathcal{A}} \pi_\theta(a \vert s)Q^\pi(s,a))\\
-
       &= \phi(s) + \sum_{a\in \mathcal{A}}\pi_\theta(a \vert s)\nabla_\theta Q^\pi(s,a)\\
-
       &= \phi(s) + \sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\nabla_\theta \sum_{s^\prime,r} P(s^\prime,r \vert s, a)(r -r(\pi) + V^\pi(s^\prime))\right),展开Q^\pi\\
-
       &= \phi(s)+ \sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\left[-\nabla_\theta r(\pi) + \sum_{s^\prime,r} P(s^\prime,r \vert s, a)\nabla_\theta V^\pi(s^\prime) \right]\right),r(\pi)与s^\prime和r无关，可以提出来 \\
-
       &= \phi(s)+ \sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\left[-\nabla_\theta r(\pi) + \sum_{s^\prime} P(s^\prime \vert s, a)\nabla_\theta V^\pi(s^\prime) \right]\right) ,消掉一个r，因为P(s^\prime \vert s,a) =\sum_rP(s^\prime,r \vert s, a) \\
-
       &=-\nabla_\theta r(\pi)+\phi(s) +\sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\sum_{s^\prime} P(s^\prime \vert s, a)\nabla_\theta V^\pi(s^\prime) \right) \\
-
       &\Rightarrow  \nabla_\theta r(\pi)= \phi(s)+\sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\sum_{s^\prime} P(s^\prime \vert s, a)\nabla_\theta V^\pi(s^\prime) \right)-\nabla_\theta V^\pi(s)
       \end{aligned}
       $$
@@ -990,18 +936,12 @@ def forward(self, x: t.Tensor) -> t.Tensor:
       \begin{aligned}
       \nabla_\theta J(\theta) &= \nabla_\theta r(\pi)\\
       &= \sum_s d^\pi(s) \left[\phi(s)+\sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\sum_{s^\prime} P(s^\prime \vert s, a)\nabla_\theta V^\pi(s^\prime) \right)-\nabla_\theta V^\pi(s)\right]\\
-
       &= \sum_s d^\pi(s)\phi(s) + \sum_s d^\pi(s)\sum_{a\in \mathcal{A}}\left(\pi_\theta(a \vert s)\sum_{s^\prime} P(s^\prime \vert s, a)\nabla_\theta V^\pi(s^\prime) \right)- \sum_s d^\pi(s)\nabla_\theta V^\pi(s),因为\sum_s d^\pi(s)=1，所以可以放在前面\\
-
       &=  \sum_s d^\pi(s)\phi(s) + \sum_{s^\prime}\underbrace{\sum_s d^\pi(s)\sum_{a\in \mathcal{A}}\pi_\theta(a \vert s) P(s^\prime \vert s, a)}_
       {d^\pi(s^\prime)}\nabla_\theta V^\pi(s^\prime) - \sum_s d^\pi(s)\nabla_\theta V^\pi(s)\\
-
       &= \sum_s d^\pi(s)\phi(s) + \sum_{s^\prime}d^\pi(s^\prime)\nabla_\theta V^\pi(s^\prime)- \sum_s d^\pi(s)\nabla_\theta V^\pi(s)\\
-
       &= \sum_s d^\pi(s)\phi(s)\\
-
       &= \sum_s d^\pi(s) \sum_a \nabla_\theta \pi_\theta(a \vert s) Q^\pi (s,a)
-
       &\propto \sum_s d^\pi(s) \sum_a \nabla_\theta \pi_\theta(a \vert s) Q^\pi (s,a)
       \end{aligned}
       $$
@@ -1015,17 +955,16 @@ def forward(self, x: t.Tensor) -> t.Tensor:
       $$
   
     至此，我们有：
-      $$
-      \begin{aligned}
-      \nabla_\theta J(\theta) &\propto \sum_s d^\pi(s) \sum_a \nabla_\theta \pi_\theta(a \vert s) Q^\pi (s,a)\\
-      &= \sum_s d^\pi(s) \sum_a \pi_\theta(a \vert s) \frac{\nabla_\theta  \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} Q^\pi (s,a)\\
-
-      &= \mathbb{E}
-      _\pi[Q^\pi (s,a)\nabla
-      _\theta \ln\pi
-      _\theta(a \vert s) ]
-      \end{aligned}
-      $$
+    $$
+    \begin{aligned}
+    \nabla_\theta J(\theta) &\propto \sum_s d^\pi(s) \sum_a \nabla_\theta \pi_\theta(a \vert s) Q^\pi (s,a)\\
+    &= \sum_s d^\pi(s) \sum_a \pi_\theta(a \vert s) \frac{\nabla_\theta  \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} Q^\pi (s,a)\
+    &= \mathbb{E}
+    _\pi[Q^\pi (s,a)\nabla
+    _\theta \ln\pi
+    _\theta(a \vert s) ]
+    \end{aligned}
+    $$
     也就是上面[简单推导](#1-具体推导简单版本)中的形式了
 
 ### 2. Actor Critic On-Policy and Advantage Actor Critic On-policy
@@ -1251,9 +1190,7 @@ $$
 $$
 \begin{aligned}
 J_\beta(\theta) &= \int_{\mathcal{S}} \rho^\beta Q^\mu(s,\mu_\theta(s))ds\\
-
 \nabla_\theta J_\beta(\theta) &= \mathbb{E}_{s \sim \rho^\beta}[\nabla_a Q^\mu(s,a) \nabla_\theta \mu_\theta(s) \vert_{a=\mu_\theta(s)}]
-
 \end{aligned}
 $$
 
@@ -1393,11 +1330,9 @@ $$
 $$
 \begin{aligned}
 J(\theta) &= \sum_{s\in \mathcal{S}} \rho^{\pi_{old}} \sum_{a \in \mathcal{A}} \left (\pi_\theta(a \vert s) \hat A_{\pi_{old}}(s,a) \right)\\
-
 &= \sum_{s\in \mathcal{S}} \rho^{\pi_{old}} \sum_{a \in \mathcal{A}} \left (\beta(a\vert s)\frac{\pi
 _
 \theta(a\vert s)}{\beta(a\vert s)} \hat A_{\pi_{old}}(s,a) \right)\\
-
 &= \mathbb{E}_
 {s \sim \rho^{\pi
 _
@@ -1484,7 +1419,6 @@ $$
 J_V(\psi) = \mathbb{E}
 _
 {s_t \sim \mathcal{D}}\left[\frac {1}{2} \left(V_\psi(s_t) - \mathbb{E}[Q_\omega(s_t,a_t)-\log \pi_\theta(a_t \vert s_t)]\right)^2\right]\\
-
 \nabla_\psi J_V(\psi) = \nabla_\psi V_\psi\left(V_\psi(s_t) - \mathbb{E}[Q_\omega(s_t,a_t)-\log \pi_\theta(a_t \vert s_t)]\right)
 $$
 
@@ -1497,7 +1431,6 @@ _
 {s
 _
 {t+1} \sim \rho_\pi(s)}[V_{\bar\psi}(s_{t+1})]))\right]\\
-
 \nabla_\omega J_Q(\omega) = \nabla_\omega Q_\omega(s_t,a_t)(Q_\omega(s_t,a_t) -r(s_t,a_t)-\gamma V_{\bar\psi}(s_{t+1}))
 $$
 其中$ \bar \psi$是target value function，它是一个指数移动平均值，像DQN中的target network一样进行soft update。
@@ -1506,7 +1439,6 @@ $$
 $$
 \begin{aligned}
 \pi_{new} &= \arg \min_{\pi^\prime \in \prod} D_{KL }\left(\pi^\prime(\cdot \vert s_t) \vert \vert \frac{\exp (Q^{\pi_{old}}(s_t,\cdot))}{Z^{\pi_{old}}(s_t)}\right)\\
-
 &=\arg \min_{\pi^\prime \in \prod} D_{KL }\left(\pi^\prime(\cdot \vert s_t) \vert \vert \exp(Q^{\pi_{old}}(s_t,\cdot)-\log Z^{\pi_{old}}(s_t))\right)
 \end{aligned}
 $$
@@ -1517,7 +1449,6 @@ $$
 J_\pi(\theta) &= \nabla_\theta D_{KL} (\pi_\theta(\cdot \vert s)\vert \vert \exp(Q_{\omega}(s_t,\cdot)-\log Z_{\omega}(s_t)))\\
 &= \mathbb{E}_
 {a_t \sim \pi} \left[- \log \left(\frac{\exp(Q_{\omega}(s_t,\cdot)-\log Z_{\omega}(s_t))}{\pi_\theta(a_t \vert s_t)}\right)\right]\\
-
 &= \mathbb{E}_
 {a_t \sim \pi} \left[\log \pi_\theta(a_t \vert s_t) - Q_\omega(s_t,a_t) + \log Z_\omega(s_t) \right]
 \end{aligned}
@@ -1592,7 +1523,6 @@ TD3在DDPG算法的基础上进一步改进，防止值函数的过估计。使�
 
     $$
     y = r + \gamma Q_{\omega} (s^\prime, \mu_\theta(s^\prime) +\epsilon)\\
-
     \epsilon \sim clip (\mathcal{N}(0,\sigma) ,-c ,+c)
     $$
 
@@ -1613,7 +1543,6 @@ Retrace 是一种离线的基于累计回报的Q值估计算法，它对任意�
     $$
     \delta_t = R_t + \gamma \mathbb{E}_{a \sim \pi}Q(S_{t+1},a) - Q(S_t,A_t)
     $$
-
     其中$R_t + \gamma \mathbb{E}
     _
     {a \sim \pi}Q(S
@@ -1688,7 +1617,6 @@ Critic更新:
 
 $$
 \mathcal{L}_{\theta_i} = \mathbb{E}_{\vec o,a_1,\dots,a_N,r_1,\dots,r_N,\vec{o ^\prime}}[(Q_i^{\vec \mu} (\vec o,a_1,\dots,a_N) - y)^2]\\
-
 y = \underbrace{r_i + \gamma Q_i^{\vec {\mu^\prime}} (\vec o^\prime,{a_1^\prime},\dots,a^\prime_N) \vert_ {a_j^\prime = \mu_{\theta_j}^\prime}}_{TD \ Target}
 $$
 

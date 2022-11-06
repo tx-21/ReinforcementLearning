@@ -7,7 +7,7 @@
 ## **简单来说，就是将 vt 从固定值换成神经网络生成的结果**
 
 ```python
-action=Actior(observation)
+action=Actor(observation)
 score=Critic(action)
 
 loss=loss_function(score)
